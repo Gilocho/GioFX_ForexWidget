@@ -4,7 +4,7 @@
 
 Always-on-top desktop widget that shows you exactly what's happening in the Forex market right now: which sessions are open, which killzones are active, DST shifts, bank holidays, and upcoming high-impact news — without ever depending on an internet connection to function.
 
-Built for traders using **MMM (Market Maker Method)** and **Trading Horse** methodologies, but the killzone windows are fully configurable for any approach.
+
 
 ---
 
