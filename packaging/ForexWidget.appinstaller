@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schema 2021: soporta ShowPrompt y UpdateBlocksActivation (el default de VS no).
+     Reemplazar PASTE_YOUR_HOSTING_URL con la URL real de hosting
+     (ej. https://github.com/USUARIO/REPO/releases/latest/download) -->
+<AppInstaller
+    Uri="PASTE_YOUR_HOSTING_URL/ForexWidget.appinstaller"
+    Version="1.0.0.0"
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2021">
+
+  <MainPackage
+      Name="ForexWidget"
+      Version="1.0.0.0"
+      Publisher="CN=GioFX"
+      ProcessorArchitecture="x64"
+      Uri="PASTE_YOUR_HOSTING_URL/ForexWidget.msix" />
+
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="24" ShowPrompt="true" UpdateBlocksActivation="false" />
+  </UpdateSettings>
+</AppInstaller>

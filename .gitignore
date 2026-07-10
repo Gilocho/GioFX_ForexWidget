@@ -1,0 +1,27 @@
+# Build outputs
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Claude Code local (permisos por máquina, no fuente)
+.claude/settings.local.json
+
+# Runtime-generated, self-healing config (ConfigurationLoader regenera todo desde defaults en C#)
+# Además: aquí vivirían las API keys si el usuario las llena — nunca deben trackearse.
+Config/
+
+# Logs
+Logs/
+
+# Cache runtime (holidays, economic events descargados)
+**/cache/
+
+# Artefactos de empaquetado MSIX (regenerables con packaging/Package-Msix.ps1)
+packaging/layout/
+packaging/dist/
+*.cer
+*.pfx
