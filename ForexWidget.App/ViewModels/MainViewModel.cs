@@ -80,6 +80,9 @@ public partial class MainViewModel : ObservableObject
 
     public ObservableCollection<SessionRowViewModel> Sessions { get; } = new();
     public ObservableCollection<KillzoneBarViewModel> Killzones { get; } = new();
+    // Leyenda: TODAS las killzones habilitadas (no solo las activas ahora),
+    // para saber qué color buscar en el overlay aunque no esté corriendo.
+    public ObservableCollection<KillzoneLegendItem> KillzoneLegend { get; } = new();
 
     public MainViewModel()
     {
@@ -203,6 +206,11 @@ public partial class MainViewModel : ObservableObject
         // ── Sessions para el timeline (con overlays de killzones) ─────
         var kzDefs = _configLoader.LoadKillzones();
         UpdateSessionRows(state.Sessions, displayOffset, kzDefs);
+
+        // ── Leyenda de colores de killzones habilitadas ────────────────
+        KillzoneLegend.Clear();
+        foreach (var kz in kzDefs.Where(k => k.Enabled))
+            KillzoneLegend.Add(new KillzoneLegendItem(kz.Name, new SolidColorBrush(TryParseHex(kz.Color))));
 
         // ── Killzones ─────────────────────────────────────────────────
         var kzStates = _killzoneEngine.GetKillzoneStates(kzDefs, utcNow);
@@ -469,6 +477,8 @@ public partial class MainViewModel : ObservableObject
         vm.RequestClose = window.Close;
         window.ShowDialog();
     }
+
+    public record KillzoneLegendItem(string Name, Brush Color);
 
     [RelayCommand]
     private void OpenSettings()

@@ -211,6 +211,7 @@ public class ConfigurationLoader : IConfigurationLoader
         new("LondonOpen",     10, true),
         new("NYOpen",         15, true),
         new("LondonClose",    10, true),
+        new("NYClose",        10, true),
         new("KillzoneStart",   5, true),
         new("HighImpactNews", 15, true),
         new("USHoliday",       0, true),

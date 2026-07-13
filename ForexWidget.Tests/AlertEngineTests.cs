@@ -116,6 +116,18 @@ public class AlertEngineTests
     }
 
     [Fact]
+    public void Case9_NYCloseIn9_5Min_AlertAt10_Fires()
+    {
+        var state = State(new[] { Session(SessionName.NewYork, "New York", minutesUntilClose: 9.5) });
+
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("NYClose", 10)], Now);
+
+        Assert.Single(triggers);
+        Assert.Equal("NYClose", triggers[0].EventName);
+        Assert.Contains("New York closes in 10 minutes", triggers[0].Message);
+    }
+
+    [Fact]
     public void Case8_NothingInWindow_ReturnsEmptyListNotNull()
     {
         var state = State(new[] { Session(SessionName.London, "London", minutesUntilOpen: 120) });

@@ -35,6 +35,9 @@ public class AlertEngine : IAlertEngine
                 case "LondonClose":
                     CheckSessionAlert(marketState, "London", def, utcNow, isOpen: false, triggers);
                     break;
+                case "NYClose":
+                    CheckSessionAlert(marketState, "New York", def, utcNow, isOpen: false, triggers);
+                    break;
                 case "KillzoneStart":
                     CheckKillzoneAlerts(killzoneStates, def, utcNow, triggers);
                     break;

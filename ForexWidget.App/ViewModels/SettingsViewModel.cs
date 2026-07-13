@@ -8,12 +8,15 @@ using ForexWidget.Infrastructure;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Media;
 
 public partial class KillzoneToggleViewModel : ObservableObject
 {
     public KillzoneDefinition Definition { get; }
 
     [ObservableProperty] private bool _isEnabled;
+    [ObservableProperty] private string _colorHex;
+    [ObservableProperty] private Brush _colorBrush;
 
     public string Name => Definition.Name;
 
@@ -21,6 +24,16 @@ public partial class KillzoneToggleViewModel : ObservableObject
     {
         Definition = definition;
         _isEnabled = definition.Enabled;
+        _colorHex = definition.Color;
+        _colorBrush = MakeBrush(definition.Color);
+    }
+
+    partial void OnColorHexChanged(string value) => ColorBrush = MakeBrush(value);
+
+    private static Brush MakeBrush(string hex)
+    {
+        try { return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)); }
+        catch { return Brushes.Orange; }
     }
 }
 
@@ -72,7 +85,7 @@ public partial class SettingsViewModel : ObservableObject
         _configLoader.SaveSettings(updated);
 
         _configLoader.SaveKillzones(
-            Killzones.Select(k => k.Definition with { Enabled = k.IsEnabled }).ToList());
+            Killzones.Select(k => k.Definition with { Enabled = k.IsEnabled, Color = k.ColorHex }).ToList());
 
         _registry.SetStartWithWindows(StartWithWindows);
 

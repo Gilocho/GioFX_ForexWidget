@@ -140,6 +140,29 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <!-- Leyenda de killzones habilitadas: qué color es cuál en el overlay -->
+            <ItemsControl ItemsSource="{Binding KillzoneLegend}" Margin="55,4,0,0">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,4">
+                            <Rectangle Width="8" Height="8"
+                                       Fill="{Binding Color}"
+                                       RadiusX="2" RadiusY="2"
+                                       Margin="0,0,4,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="9"
+                                       Style="{DynamicResource LabelSecondary}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
             <Separator Margin="0,8,0,8"/>
 
             <!-- ── MARKET CONTEXT ── -->

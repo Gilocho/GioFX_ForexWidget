@@ -66,9 +66,21 @@
             <ItemsControl ItemsSource="{Binding Killzones}" Margin="0,0,0,12">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox IsChecked="{Binding IsEnabled}" Margin="0,2">
-                            <TextBlock Text="{Binding Name}"/>
-                        </CheckBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <CheckBox IsChecked="{Binding IsEnabled}" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Name}"/>
+                            </CheckBox>
+                            <Rectangle Width="16" Height="16"
+                                       Fill="{Binding ColorBrush}"
+                                       Stroke="{DynamicResource TextSecondaryBrush}"
+                                       StrokeThickness="1"
+                                       RadiusX="2" RadiusY="2"
+                                       Margin="8,0,0,0"
+                                       Cursor="Hand"
+                                       VerticalAlignment="Center"
+                                       MouseLeftButtonDown="ColorSwatch_Click"
+                                       Tag="{Binding}"/>
+                        </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -47,13 +47,13 @@ public class ConfigurationLoaderTests
     }
 
     [Fact]
-    public void Case4_AlertsNotFound_Returns7Alerts()
+    public void Case4_AlertsNotFound_Returns8Alerts()
     {
         string dir = CreateTempConfigDir();
         var loader = new ConfigurationLoader(dir);
         var alerts = loader.LoadAlerts();
 
-        Assert.Equal(7, alerts.Count);
+        Assert.Equal(8, alerts.Count);
         Directory.Delete(dir, true);
     }
 

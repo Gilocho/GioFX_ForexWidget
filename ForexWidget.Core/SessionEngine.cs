@@ -14,7 +14,7 @@ public class SessionEngine : ISessionEngine
 
     private static readonly IReadOnlyList<SessionDefinition> BaseDefinitions =
     [
-        new(SessionName.Sydney,  "Sydney",   new TimeOnly(21, 0), new TimeOnly( 6, 0), "AUS Eastern Standard Time"),
+        new(SessionName.Sydney,  "Sydney",   new TimeOnly(22, 0), new TimeOnly( 7, 0), "AUS Eastern Standard Time"),
         new(SessionName.Tokyo,   "Tokyo",    new TimeOnly( 0, 0), new TimeOnly( 9, 0), "Tokyo Standard Time"),
         new(SessionName.London,  "London",   new TimeOnly( 7, 0), new TimeOnly(16, 0), "GMT Standard Time"),
         new(SessionName.NewYork, "New York", new TimeOnly(12, 0), new TimeOnly(21, 0), "Eastern Standard Time"),
