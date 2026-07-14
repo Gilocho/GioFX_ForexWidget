@@ -51,6 +51,10 @@ public partial class MainViewModel : ObservableObject
     private readonly IAlertEngine _alertEngine;
     private readonly INotificationService _notificationService;
     private readonly Dictionary<string, DateTimeOffset> _firedAlerts = new();
+    // Dedup separado para alertas de día completo (USHoliday): el dedup de 2h de arriba
+    // repetiría la notificación cada 2h durante todo el día. Esta clave por fecha calendario
+    // dispara una sola vez por día, no una sola vez por ventana de tiempo transcurrido.
+    private readonly Dictionary<string, DateOnly> _firedDailyAlerts = new();
     private DateTimeOffset _lastAlertPurge = DateTimeOffset.MinValue;
 
     // ── Observable properties ─────────────────────────────────────────
@@ -248,14 +252,30 @@ public partial class MainViewModel : ObservableObject
     // Dedup por EventName con supresión de 30 min: la ventana de disparo de 1 min
     // puede abarcar dos minutos de reloj entre ticks de 30s, así que una clave por
     // minuto exacto dispararía dos veces. Ningún evento legítimo se repite en <30 min.
+    // Las alertas de día completo (USHoliday) usan un dedup separado por fecha, no por
+    // tiempo transcurrido — ver _firedDailyAlerts.
     private void EvaluateAlerts(
         MarketState state, IReadOnlyList<KillzoneState> kzStates, DstStatus dstStatus, DateTimeOffset utcNow)
     {
         var alertDefs = _configLoader.LoadAlerts();
-        var triggers = _alertEngine.Evaluate(state, kzStates, dstStatus, alertDefs, utcNow);
+        var holidays = _holidayProvider.GetCachedHolidays();
+        var upcomingNews = _calendarProvider.GetUpcomingHighImpact(utcNow, maxCount: 10);
+        var triggers = _alertEngine.Evaluate(state, kzStates, dstStatus, alertDefs, holidays, upcomingNews, utcNow);
+
+        var today = DateOnly.FromDateTime(utcNow.UtcDateTime);
 
         foreach (var trigger in triggers)
         {
+            if (trigger.EventName.StartsWith("USHoliday:"))
+            {
+                if (_firedDailyAlerts.TryGetValue(trigger.EventName, out var firedDate) && firedDate == today)
+                    continue;
+
+                _firedDailyAlerts[trigger.EventName] = today;
+                _notificationService.ShowNotification(trigger.Title, trigger.Message);
+                continue;
+            }
+
             if (_firedAlerts.TryGetValue(trigger.EventName, out var lastFired)
                 && utcNow - lastFired < TimeSpan.FromMinutes(30))
                 continue;
@@ -274,6 +294,14 @@ public partial class MainViewModel : ObservableObject
                 .ToList();
             foreach (var key in expired)
                 _firedAlerts.Remove(key);
+
+            // Margen de 1 día extra: nunca purgar "hoy" antes de que termine el día.
+            var expiredDaily = _firedDailyAlerts
+                .Where(kv => (today.DayNumber - kv.Value.DayNumber) > 1)
+                .Select(kv => kv.Key)
+                .ToList();
+            foreach (var key in expiredDaily)
+                _firedDailyAlerts.Remove(key);
         }
     }
 

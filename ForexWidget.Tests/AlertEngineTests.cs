@@ -44,7 +44,7 @@ public class AlertEngineTests
     {
         var state = State(new[] { Session(SessionName.London, "London", minutesUntilOpen: 9.5) });
 
-        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10)], Now);
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10)], [], [], Now);
 
         Assert.Single(triggers);
         Assert.Equal("LondonOpen", triggers[0].EventName);
@@ -56,7 +56,7 @@ public class AlertEngineTests
     {
         var state = State(new[] { Session(SessionName.London, "London", minutesUntilOpen: 10.5) });
 
-        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10)], Now);
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10)], [], [], Now);
 
         Assert.Empty(triggers);
     }
@@ -66,7 +66,7 @@ public class AlertEngineTests
     {
         var state = State(new[] { Session(SessionName.London, "London", minutesUntilOpen: 8.9) });
 
-        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10)], Now);
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10)], [], [], Now);
 
         Assert.Empty(triggers);
     }
@@ -76,7 +76,7 @@ public class AlertEngineTests
     {
         var state = State(new[] { Session(SessionName.London, "London", minutesUntilOpen: 9.5) });
 
-        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10, enabled: false)], Now);
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("LondonOpen", 10, enabled: false)], [], [], Now);
 
         Assert.Empty(triggers);
     }
@@ -86,7 +86,7 @@ public class AlertEngineTests
     {
         var killzones = new[] { Killzone("London Open", 4.5) };
 
-        var triggers = _engine.Evaluate(State(), killzones, NoDst, [Alert("KillzoneStart", 5)], Now);
+        var triggers = _engine.Evaluate(State(), killzones, NoDst, [Alert("KillzoneStart", 5)], [], [], Now);
 
         Assert.Single(triggers);
         Assert.Equal("KillzoneStart:London Open", triggers[0].EventName);
@@ -98,7 +98,7 @@ public class AlertEngineTests
     {
         var killzones = new[] { Killzone("New York Open", 4.5), Killzone("London-NY Overlap", 4.2) };
 
-        var triggers = _engine.Evaluate(State(), killzones, NoDst, [Alert("KillzoneStart", 5)], Now);
+        var triggers = _engine.Evaluate(State(), killzones, NoDst, [Alert("KillzoneStart", 5)], [], [], Now);
 
         Assert.Equal(2, triggers.Count);
         Assert.Equal(2, triggers.Select(t => t.EventName).Distinct().Count());
@@ -109,7 +109,7 @@ public class AlertEngineTests
     {
         var state = State(nextMilestoneName: "Weekend Close", minutesUntilMilestone: 29.5);
 
-        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("WeekendClose", 30)], Now);
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("WeekendClose", 30)], [], [], Now);
 
         Assert.Single(triggers);
         Assert.Equal("WeekendClose", triggers[0].EventName);
@@ -120,7 +120,7 @@ public class AlertEngineTests
     {
         var state = State(new[] { Session(SessionName.NewYork, "New York", minutesUntilClose: 9.5) });
 
-        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("NYClose", 10)], Now);
+        var triggers = _engine.Evaluate(state, [], NoDst, [Alert("NYClose", 10)], [], [], Now);
 
         Assert.Single(triggers);
         Assert.Equal("NYClose", triggers[0].EventName);
@@ -134,9 +134,108 @@ public class AlertEngineTests
         var killzones = new[] { Killzone("London Open", 90) };
 
         var triggers = _engine.Evaluate(state, killzones, NoDst,
-            [Alert("LondonOpen", 10), Alert("KillzoneStart", 5), Alert("WeekendClose", 30)], Now);
+            [Alert("LondonOpen", 10), Alert("KillzoneStart", 5), Alert("WeekendClose", 30)], [], [], Now);
 
         Assert.NotNull(triggers);
         Assert.Empty(triggers);
+    }
+
+    private static readonly DateOnly Today = DateOnly.FromDateTime(Now.UtcDateTime);
+
+    private static HolidayEvent Holiday(string currency, DateOnly date, string name = "Bank Holiday")
+        => new(currency, name, date);
+
+    private static EconomicEvent Economic(string currency, string eventName, double minutesFromNow, string? forecast = null)
+        => new(currency, eventName, "High", Now + TimeSpan.FromMinutes(minutesFromNow), forecast, null);
+
+    [Fact]
+    public void Case10_HolidayToday_USHolidayEnabled_FiresWithDateAndCurrencyInEventName()
+    {
+        var holidays = new[] { Holiday("USD", Today, "Independence Day") };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("USHoliday", 0)], holidays, [], Now);
+
+        Assert.Single(triggers);
+        Assert.Equal($"USHoliday:USD:{Today:yyyy-MM-dd}", triggers[0].EventName);
+    }
+
+    [Fact]
+    public void Case11_HolidayNotToday_DoesNotFire()
+    {
+        var holidays = new[] { Holiday("USD", Today.AddDays(-1)), Holiday("USD", Today.AddDays(1)) };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("USHoliday", 0)], holidays, [], Now);
+
+        Assert.Empty(triggers);
+    }
+
+    [Fact]
+    public void Case12_HolidayTodayButUSHolidayDisabled_DoesNotFire()
+    {
+        var holidays = new[] { Holiday("USD", Today) };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("USHoliday", 0, enabled: false)], holidays, [], Now);
+
+        Assert.Empty(triggers);
+    }
+
+    [Fact]
+    public void Case13_TwoHolidaysToday_FiresTwoDistinctTriggers()
+    {
+        var holidays = new[] { Holiday("USD", Today), Holiday("JPY", Today) };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("USHoliday", 0)], holidays, [], Now);
+
+        Assert.Equal(2, triggers.Count);
+        Assert.Equal(2, triggers.Select(t => t.EventName).Distinct().Count());
+    }
+
+    [Fact]
+    public void Case14_EvaluateCalledTwiceWithSameHolidayToday_EngineFiresBothTimes_StatelessByDesign()
+    {
+        var holidays = new[] { Holiday("USD", Today) };
+
+        var first = _engine.Evaluate(State(), [], NoDst, [Alert("USHoliday", 0)], holidays, [], Now);
+        var second = _engine.Evaluate(State(), [], NoDst, [Alert("USHoliday", 0)], holidays, [], Now);
+
+        Assert.Single(first);
+        Assert.Single(second);
+        Assert.Equal(first[0].EventName, second[0].EventName);
+    }
+
+    [Fact]
+    public void Case15_EconomicEventIn14_5Min_AlertAt15_Fires()
+    {
+        var events = new[] { Economic("USD", "CPI m/m", 14.5, forecast: "0.3%") };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("HighImpactNews", 15)], [], events, Now);
+
+        Assert.Single(triggers);
+        Assert.Contains("forecast: 0.3%", triggers[0].Message);
+    }
+
+    [Fact]
+    public void Case16_EconomicEventIn15_5Min_AlertAt15_DoesNotFire()
+    {
+        var events = new[] { Economic("USD", "CPI m/m", 15.5) };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("HighImpactNews", 15)], [], events, Now);
+
+        Assert.Empty(triggers);
+    }
+
+    [Fact]
+    public void Case17_TwoEconomicEventsInWindow_FiresTwoDistinctTriggers()
+    {
+        var events = new[]
+        {
+            Economic("USD", "CPI m/m", 14.5),
+            Economic("EUR", "ECB Rate Decision", 14.2)
+        };
+
+        var triggers = _engine.Evaluate(State(), [], NoDst, [Alert("HighImpactNews", 15)], [], events, Now);
+
+        Assert.Equal(2, triggers.Count);
+        Assert.Equal(2, triggers.Select(t => t.EventName).Distinct().Count());
     }
 }

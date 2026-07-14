@@ -17,5 +17,7 @@ public interface IAlertEngine
         IReadOnlyList<KillzoneState> killzoneStates,
         DstStatus dstStatus,
         IReadOnlyList<AlertDefinition> alertDefinitions,
+        IReadOnlyList<HolidayEvent> holidays,
+        IReadOnlyList<EconomicEvent> upcomingHighImpact,
         DateTimeOffset utcNow);
 }

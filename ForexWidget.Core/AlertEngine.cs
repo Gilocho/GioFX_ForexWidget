@@ -18,6 +18,8 @@ public class AlertEngine : IAlertEngine
         IReadOnlyList<KillzoneState> killzoneStates,
         DstStatus dstStatus,
         IReadOnlyList<AlertDefinition> alertDefinitions,
+        IReadOnlyList<HolidayEvent> holidays,
+        IReadOnlyList<EconomicEvent> upcomingHighImpact,
         DateTimeOffset utcNow)
     {
         var triggers = new List<AlertTrigger>();
@@ -44,9 +46,12 @@ public class AlertEngine : IAlertEngine
                 case "WeekendClose":
                     CheckWeekendAlert(marketState, def, utcNow, triggers);
                     break;
-                // "USHoliday" y "HighImpactNews": TODO — requieren extender la firma
-                // del método con IHolidayProvider / IEconomicCalendarProvider en un
-                // sprint futuro. No se implementan con datos ficticios.
+                case "USHoliday":
+                    CheckHolidayAlerts(holidays, def, utcNow, triggers);
+                    break;
+                case "HighImpactNews":
+                    CheckHighImpactNewsAlerts(upcomingHighImpact, def, utcNow, triggers);
+                    break;
             }
         }
 
@@ -104,6 +109,41 @@ public class AlertEngine : IAlertEngine
                 "Weekend Close Approaching",
                 $"Market closes for the weekend in {def.MinutesBefore} minutes",
                 utcNow));
+        }
+    }
+
+    private static void CheckHolidayAlerts(
+        IReadOnlyList<HolidayEvent> holidays, AlertDefinition def,
+        DateTimeOffset utcNow, List<AlertTrigger> triggers)
+    {
+        var today = DateOnly.FromDateTime(utcNow.UtcDateTime);
+
+        foreach (var holiday in holidays.Where(h => h.Date == today))
+        {
+            triggers.Add(new AlertTrigger(
+                $"USHoliday:{holiday.Currency}:{holiday.Date:yyyy-MM-dd}",
+                $"{holiday.Currency} Holiday Today",
+                $"{holiday.Name} — {holiday.Currency} liquidity may be reduced today",
+                utcNow));
+        }
+    }
+
+    private static void CheckHighImpactNewsAlerts(
+        IReadOnlyList<EconomicEvent> events, AlertDefinition def,
+        DateTimeOffset utcNow, List<AlertTrigger> triggers)
+    {
+        foreach (var evt in events)
+        {
+            var remaining = evt.TimeUtc - utcNow;
+            if (IsWithinTriggerWindow(remaining, def.MinutesBefore))
+            {
+                triggers.Add(new AlertTrigger(
+                    $"HighImpactNews:{evt.Currency}:{evt.EventName}:{evt.TimeUtc:yyyyMMddHHmm}",
+                    $"{evt.Currency} High Impact: {evt.EventName}",
+                    $"{evt.EventName} in {def.MinutesBefore} minutes" +
+                        (evt.Forecast is not null ? $" (forecast: {evt.Forecast})" : ""),
+                    utcNow));
+            }
         }
     }
 
