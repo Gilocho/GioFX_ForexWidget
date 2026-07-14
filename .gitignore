@@ -25,3 +25,4 @@ packaging/layout/
 packaging/dist/
 *.cer
 *.pfx
+CLAUDE.md
