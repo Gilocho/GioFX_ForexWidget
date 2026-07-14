@@ -2,16 +2,20 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-// Genera el ícono de ForexWidget: insignia circular con la paleta de marca.
+// Genera el ícono de ForexWidget: insignia circular plana con la paleta de marca.
+// Diseño (flat, sin degradados/sombras/bisel, legible hasta 44 px):
+//   - insignia circular navy #1A1A2E que llena el canvas (esquinas transparentes),
+//   - aro de reloj FINO en coral #E94560 con una abertura abajo,
+//   - barra de sesión activa en menta #00FFAA descansando en esa abertura.
+// Pocas formas + alto contraste = reconocible a tamaños muy chicos.
 // Salida: AppIcon.ico (16/32/48/256) + PNGs para el manifest MSIX (44/50/150/256).
 
 string outDir = args.Length > 0 ? args[0] : ".";
 Directory.CreateDirectory(outDir);
 
-var bg = ColorTranslator.FromHtml("#1A1A2E");       // Background
-var primary = ColorTranslator.FromHtml("#0F3460");  // Primary (aro sutil)
-var accent = ColorTranslator.FromHtml("#E94560");   // Accent (aro de reloj)
-var overlap = ColorTranslator.FromHtml("#00FFAA");  // Overlap (barra de sesión)
+var bg = ColorTranslator.FromHtml("#1A1A2E");       // Background (insignia navy)
+var accent = ColorTranslator.FromHtml("#E94560");   // Accent (aro de reloj coral)
+var overlap = ColorTranslator.FromHtml("#00FFAA");  // Overlap (barra de sesión menta)
 
 Bitmap Draw(int s)
 {
@@ -20,26 +24,22 @@ Bitmap Draw(int s)
     g.SmoothingMode = SmoothingMode.AntiAlias;
     g.Clear(Color.Transparent);
 
-    // Fondo circular
+    // Insignia circular: fondo navy que llena el canvas (esquinas transparentes)
     using (var b = new SolidBrush(bg))
         g.FillEllipse(b, 0, 0, s - 1, s - 1);
 
-    // Borde exterior sutil en Primary
-    float borderW = Math.Max(1f, s / 28f);
-    using (var p = new Pen(primary, borderW))
-        g.DrawEllipse(p, borderW / 2, borderW / 2, s - 1 - borderW, s - 1 - borderW);
-
-    // Aro de reloj: arco 3/4 en Accent, arranca a las 12
-    float arcW = Math.Max(1.5f, s / 9f);
-    float inset = s * 0.18f;
+    // Aro de reloj FINO en Accent, con abertura de 90° abajo (para la barra).
+    // GDI: 0° = 3 en punto, positivo = horario. Dibuja 135°→405°, deja hueco 45°→135°.
+    float arcW = Math.Max(2f, s / 14f);
+    float inset = s * 0.22f;                 // ≈22% de margen: sin recortes a tamaños chicos
     using (var p = new Pen(accent, arcW) { StartCap = LineCap.Round, EndCap = LineCap.Round })
-        g.DrawArc(p, inset, inset, s - 2 * inset, s - 2 * inset, -90, 270);
+        g.DrawArc(p, inset, inset, s - 2 * inset, s - 2 * inset, 135, 270);
 
-    // Barra de sesión activa en Overlap, cruzando bajo el centro
-    float barH = Math.Max(1.5f, s * 0.11f);
-    float barW = s * 0.42f;
+    // Barra de sesión activa en Overlap, descansando en la abertura inferior del aro
+    float barH = Math.Max(2f, s * 0.09f);
+    float barW = s * 0.44f;
     float barX = (s - barW) / 2;
-    float barY = s * 0.56f;
+    float barY = s * 0.63f;
     using (var b = new SolidBrush(overlap))
     {
         if (s >= 32)
@@ -51,18 +51,6 @@ Bitmap Draw(int s)
         {
             g.FillRectangle(b, barX, barY, barW, barH);
         }
-    }
-
-    // Manecilla corta hacia la 1 en punto (solo legible en tamaños grandes)
-    if (s >= 48)
-    {
-        float cx = s / 2f, cy = s / 2f;
-        float handLen = s * 0.16f;
-        double angle = -60 * Math.PI / 180; // "1 en punto"
-        using var p = new Pen(accent, Math.Max(1.5f, s / 24f)) { EndCap = LineCap.Round };
-        g.DrawLine(p, cx, cy,
-            cx + (float)(handLen * Math.Cos(angle)),
-            cy + (float)(handLen * Math.Sin(angle)));
     }
 
     return bmp;
