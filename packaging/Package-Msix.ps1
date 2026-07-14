@@ -37,7 +37,10 @@ if ($LASTEXITCODE -ne 0) { throw "dotnet publish falló" }
 # 2. Manifest + imágenes al layout
 Write-Host "[2/4] Copiando manifest e imágenes..." -ForegroundColor Cyan
 $manifest = Get-Content (Join-Path $PSScriptRoot "AppxManifest.xml") -Raw
-$manifest = $manifest -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"$Version`""
+# Solo la Version de <Identity>. El lookbehind (?<!\w) evita que el patron toque
+# MinVersion="10.0.17763.0" (sin el, el regex la reescribia a 1.0.0.0 al empaquetar).
+# MaxVersionTested no coincide ("VersionTested").
+$manifest = $manifest -replace '(?<!\w)Version="\d+\.\d+\.\d+\.\d+"', "Version=`"$Version`""
 Set-Content (Join-Path $layout "AppxManifest.xml") $manifest -Encoding UTF8
 Copy-Item (Join-Path $PSScriptRoot "Images") (Join-Path $layout "Images") -Recurse -Force
 
