@@ -88,9 +88,16 @@ Contributions are welcome. Since this project is GPLv3 (see [LICENSE](LICENSE)),
 
 ---
 
-## Support this project
+### ♥ Support this project
 
-ForexWidget is free and always will be. If it's useful to you, there's a **♥ Support** button inside the app with donation options (PayPal, USDT — multiple networks).
+ForexWidget is free and always will be. If it has been useful to you, you can support its continued development using the **♥ Support** button inside the app, or directly through any of the options below:
+
+| Method | Network | Link / Address |
+| :--- | :--- | :--- |
+| ☕ **PayPal** | Direct Link | [paypal.me/Giodow](https://paypal.me/Giodow) |
+| 💵 **USDT** | Tron (TRC20) | `TMgpufHnuhQLBZxr4LTF6wY3ZyCibQnhJc` |
+| 💵 **USDT** | BSC (BEP20) | `0x2f4fc2f588d6222b34b997fe2d6b9ad14f6bebce` |
+| 💵 **USDT** | Ethereum (ERC20) | `0x2f4fc2f588d6222b34b997fe2d6b9ad14f6bebce` |
 
 ---
 
