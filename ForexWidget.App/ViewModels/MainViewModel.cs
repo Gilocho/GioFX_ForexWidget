@@ -496,13 +496,11 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenSupport()
     {
-        var vm = new SupportViewModel();
         var window = new SupportWindow
         {
-            DataContext = vm,
+            DataContext = new SupportViewModel(),
             Owner = Application.Current.MainWindow
         };
-        vm.RequestClose = window.Close;
         window.ShowDialog();
     }
 
