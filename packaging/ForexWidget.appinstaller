@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- NOTA (rama store-release): este .appinstaller NO se usa para la distribucion de
+     Microsoft Store — Store gestiona sus propias actualizaciones automaticas una vez
+     publicada la app. Se conserva solo como referencia del flujo de sideload (rama main)
+     y por eso mantiene la identidad vieja (CN=GioFX), sin actualizar a la de Store. -->
 <!-- Schema 2021: soporta ShowPrompt y UpdateBlocksActivation (el default de VS no).
      Reemplazar PASTE_YOUR_HOSTING_URL con la URL real de hosting
      (ej. https://github.com/USUARIO/REPO/releases/latest/download) -->

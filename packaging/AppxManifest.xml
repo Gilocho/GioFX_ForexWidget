@@ -4,15 +4,17 @@
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
          IgnorableNamespaces="uap rescap">
 
-  <!-- Publisher DEBE coincidir exactamente con el Subject del certificado de firma -->
-  <Identity Name="ForexWidget"
-            Publisher="CN=GioFX"
+  <!-- Identidad real asignada por Microsoft Partner Center (rama store-release).
+       Microsoft firma el paquete durante la certificacion, por lo que aqui NO
+       aplica el certificado autofirmado CN=GioFX del flujo de sideload (rama main). -->
+  <Identity Name="FxGio.ForexWidget"
+            Publisher="CN=A300F14C-B8C5-458D-9D38-45A17EC54C60"
             Version="1.0.0.0"
             ProcessorArchitecture="x64" />
 
   <Properties>
     <DisplayName>ForexWidget</DisplayName>
-    <PublisherDisplayName>GioFX</PublisherDisplayName>
+    <PublisherDisplayName>FxGio</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
 
