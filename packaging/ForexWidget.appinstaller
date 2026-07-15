@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Schema 2021: soporta ShowPrompt y UpdateBlocksActivation (el default de VS no).
-     Reemplazar PASTE_YOUR_HOSTING_URL con la URL real de hosting
-     (ej. https://github.com/USUARIO/REPO/releases/latest/download) -->
+     Las URLs "latest release" de GitHub resuelven siempre a los assets de la release
+     más reciente, así que no hay que tocarlas al publicar una versión nueva. A cambio,
+     los assets deben subirse a la Release con estos nombres EXACTOS: ForexWidget.msix
+     y ForexWidget.appinstaller — si el nombre no coincide, la URL da 404 y la
+     actualización falla en silencio.
+     Las Version de aquí son PLANTILLA: Package-Msix.ps1 -Version las estampa junto con
+     la del AppxManifest en una sola operación y deja el archivo listo en dist/. -->
 <AppInstaller
-    Uri="PASTE_YOUR_HOSTING_URL/ForexWidget.appinstaller"
+    Uri="https://github.com/Gilocho/GioFX_ForexWidget/releases/latest/download/ForexWidget.appinstaller"
     Version="1.0.0.0"
     xmlns="http://schemas.microsoft.com/appx/appinstaller/2021">
 
@@ -12,7 +17,7 @@
       Version="1.0.0.0"
       Publisher="CN=GioFX"
       ProcessorArchitecture="x64"
-      Uri="PASTE_YOUR_HOSTING_URL/ForexWidget.msix" />
+      Uri="https://github.com/Gilocho/GioFX_ForexWidget/releases/latest/download/ForexWidget.msix" />
 
   <UpdateSettings>
     <OnLaunch HoursBetweenUpdateChecks="24" ShowPrompt="true" UpdateBlocksActivation="false" />
