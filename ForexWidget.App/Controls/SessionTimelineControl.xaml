@@ -6,31 +6,37 @@
              mc:Ignorable="d"
              d:DesignHeight="18" d:DesignWidth="240">
 
-    <Grid Height="18">
+    <!-- MinHeight en vez de Height fija: la fila crece si se muestra el horario.
+         La columna de 55 no cambia — está alineada con los marcadores de hora de MainWindow. -->
+    <Grid MinHeight="18">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="55"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Column="0"
-                   Text="{Binding Name}"
-                   Style="{DynamicResource LabelSecondary}"
-                   VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Name}"
+                       Style="{DynamicResource LabelSecondary}"/>
+            <TextBlock Text="{Binding TimeRangeText}"
+                       Style="{DynamicResource LabelSecondary}"
+                       FontSize="8"
+                       Opacity="0.7"
+                       Visibility="{Binding ShowSessionTimes, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        </StackPanel>
 
         <Canvas x:Name="BarCanvas"
                 Grid.Column="1"
                 SizeChanged="BarCanvas_SizeChanged">
+            <!-- Canvas.Top y la altura de NowLine los fija Redraw(): dependen de la
+                 altura real de la fila, que varía según se muestre el horario -->
             <Rectangle x:Name="RailRect"
-                       Canvas.Top="2"
                        Height="14"
                        Fill="{DynamicResource SessionClosedBrush}"
                        RadiusX="2" RadiusY="2"/>
             <Rectangle x:Name="BarRect"
-                       Canvas.Top="2"
                        Height="14"
                        RadiusX="2" RadiusY="2"/>
             <Rectangle x:Name="BarRect2"
-                       Canvas.Top="2"
                        Height="14"
                        RadiusX="2" RadiusY="2"
                        Visibility="Collapsed"/>
@@ -38,7 +44,6 @@
             <Rectangle x:Name="NowLine"
                        Canvas.Top="0"
                        Width="1.5"
-                       Height="18"
                        Panel.ZIndex="10"
                        Fill="{DynamicResource AccentBrush}"/>
         </Canvas>

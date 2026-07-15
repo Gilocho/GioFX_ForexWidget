@@ -27,6 +27,18 @@ public static class TimeDisplayHelper
     }
 
     /// <summary>
+    /// Converts a UTC TimeOnly to the equivalent TimeOnly under the given display offset.
+    /// Wraps correctly across midnight. Use for TEXT display (vs ToDisplayFraction for bar positioning).
+    /// Example: utcTime=02:00, offset=-5h → 21:00 (previous day)
+    /// </summary>
+    public static TimeOnly ToDisplayTimeOnly(TimeOnly utcTime, TimeSpan offset)
+    {
+        int totalMinutes = utcTime.Hour * 60 + utcTime.Minute + (int)offset.TotalMinutes;
+        totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+        return new TimeOnly(totalMinutes / 60, totalMinutes % 60);
+    }
+
+    /// <summary>
     /// Returns the offset to apply for display purposes.
     /// TimeSpan.Zero if displayMode is "UTC" (or anything other than "Local").
     /// The machine's current local UTC offset (DST-aware) if displayMode is "Local".

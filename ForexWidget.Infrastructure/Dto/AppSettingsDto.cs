@@ -10,4 +10,5 @@ public class AppSettingsDto
     public string FinnhubApiKey   { get; set; } = "";
     public string FMPApiKey       { get; set; } = "";
     public string Language        { get; set; } = "en";
+    public bool   ShowSessionTimes { get; set; } = false;
 }

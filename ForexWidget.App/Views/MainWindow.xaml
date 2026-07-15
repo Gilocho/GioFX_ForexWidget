@@ -313,7 +313,7 @@
             </Grid>
 
             <!-- ── FOOTER ── -->
-            <TextBlock Text="ForexWidget · UTC · MMM"
+            <TextBlock Text="{Binding AppVersionText, StringFormat='ForexWidget {0} · UTC · MMM'}"
                        Style="{DynamicResource LabelSecondary}"
                        HorizontalAlignment="Center"
                        Margin="0,8,0,0"

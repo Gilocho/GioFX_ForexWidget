@@ -8,7 +8,8 @@ public record AppSettings(
     string HolidayProvider,
     string FinnhubApiKey,
     string FMPApiKey,
-    string Language
+    string Language,
+    bool ShowSessionTimes
 )
 {
     public static AppSettings Default => new(
@@ -19,6 +20,7 @@ public record AppSettings(
         HolidayProvider: "ForexFactory",
         FinnhubApiKey: "",
         FMPApiKey: "",
-        Language: "en"
+        Language: "en",
+        ShowSessionTimes: false
     );
 }

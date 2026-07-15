@@ -6,6 +6,7 @@ using ForexWidget.Core;
 using ForexWidget.Domain.Enums;
 using ForexWidget.Domain.Interfaces;
 using ForexWidget.Domain.Models;
+using ForexWidget.App.Utils;
 using ForexWidget.App.Views;
 using ForexWidget.Infrastructure;
 using ForexWidget.Infrastructure.Cache;
@@ -81,6 +82,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _windowOpacity = 0.95;
     [ObservableProperty] private string _timeDisplayLabel = "UTC";
     [ObservableProperty] private string _nextKillzoneText = "";
+
+    // La versión del paquete no cambia en caliente: se lee una sola vez, no en cada refresh
+    public string AppVersionText { get; } = AppVersionHelper.GetDisplayVersion();
 
     public ObservableCollection<SessionRowViewModel> Sessions { get; } = new();
     public ObservableCollection<KillzoneBarViewModel> Killzones { get; } = new();
@@ -179,7 +183,8 @@ public partial class MainViewModel : ObservableObject
         var utcNow = DateTimeOffset.UtcNow;
 
         // ── Modo de display (UTC/Local) desde settings, luego reloj ────
-        _timeDisplayMode = _configLoader.LoadSettings().TimeDisplay;
+        var settings = _configLoader.LoadSettings();
+        _timeDisplayMode = settings.TimeDisplay;
         UpdateClockOnly();
         var displayOffset = TimeDisplayHelper.GetDisplayOffset(_timeDisplayMode, utcNow);
 
@@ -209,7 +214,7 @@ public partial class MainViewModel : ObservableObject
 
         // ── Sessions para el timeline (con overlays de killzones) ─────
         var kzDefs = _configLoader.LoadKillzones();
-        UpdateSessionRows(state.Sessions, displayOffset, kzDefs);
+        UpdateSessionRows(state.Sessions, displayOffset, kzDefs, settings.ShowSessionTimes);
 
         // ── Leyenda de colores de killzones habilitadas ────────────────
         KillzoneLegend.Clear();
@@ -368,7 +373,7 @@ public partial class MainViewModel : ObservableObject
 
     private void UpdateSessionRows(
         IReadOnlyList<SessionState> sessions, TimeSpan displayOffset,
-        IReadOnlyList<KillzoneDefinition> killzoneDefs)
+        IReadOnlyList<KillzoneDefinition> killzoneDefs, bool showSessionTimes)
     {
         // Segmentos de killzones habilitadas en fracciones de display
         // (mismo offset que las barras — el overlay respeta el toggle UTC/Local)
@@ -393,12 +398,19 @@ public partial class MainViewModel : ObservableObject
         Sessions.Clear();
         foreach (var s in sessions)
         {
+            // Mismo offset que las barras, para que el texto coincida con dónde
+            // empieza y termina la barra de esa sesión en el timeline
+            var displayOpen = TimeDisplayHelper.ToDisplayTimeOnly(s.OpenUtc, displayOffset);
+            var displayClose = TimeDisplayHelper.ToDisplayTimeOnly(s.CloseUtc, displayOffset);
+
             var vm = new SessionRowViewModel
             {
                 Name = s.DisplayName,
                 IsOpen = s.Status == SessionStatus.Open,
                 OpenTimeUtc = s.OpenUtc.ToString("HH:mm"),
                 CloseTimeUtc = s.CloseUtc.ToString("HH:mm"),
+                TimeRangeText = $"{displayOpen:HH:mm}-{displayClose:HH:mm}",
+                ShowSessionTimes = showSessionTimes,
                 BarColor = s.Status == SessionStatus.Open
                     ? (Brush)Application.Current.FindResource("SessionOpenBrush")
                     : (Brush)Application.Current.FindResource("SessionClosedBrush")
