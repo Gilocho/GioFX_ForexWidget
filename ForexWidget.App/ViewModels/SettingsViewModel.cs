@@ -50,6 +50,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private double _opacity = 0.95;
     [ObservableProperty] private bool _startWithWindows;
     [ObservableProperty] private bool _showLocalTime;
+    [ObservableProperty] private bool _showSessionTimes;
 
     public string[] ThemeOptions { get; } = ["Dark", "Light"];
     public ObservableCollection<KillzoneToggleViewModel> Killzones { get; } = new();
@@ -68,6 +69,7 @@ public partial class SettingsViewModel : ObservableObject
         Opacity = Math.Clamp(_original.Opacity, 0.5, 1.0);
         StartWithWindows = registry.IsStartWithWindowsEnabled();
         ShowLocalTime = string.Equals(_original.TimeDisplay, "Local", StringComparison.OrdinalIgnoreCase);
+        ShowSessionTimes = _original.ShowSessionTimes;
 
         foreach (var kz in configLoader.LoadKillzones())
             Killzones.Add(new KillzoneToggleViewModel(kz));
@@ -80,7 +82,8 @@ public partial class SettingsViewModel : ObservableObject
         {
             Theme = Theme,
             Opacity = Opacity,
-            TimeDisplay = ShowLocalTime ? "Local" : "UTC"
+            TimeDisplay = ShowLocalTime ? "Local" : "UTC",
+            ShowSessionTimes = ShowSessionTimes
         };
         _configLoader.SaveSettings(updated);
 

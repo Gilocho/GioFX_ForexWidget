@@ -12,6 +12,8 @@ public partial class SessionTimelineControl : UserControl
     // redraw para no acumular elementos fantasma en el Canvas
     private readonly List<Rectangle> _overlayRects = new();
 
+    private const double BarHeight = 14;
+
     public static readonly DependencyProperty NowFractionProperty =
         DependencyProperty.Register(
             nameof(NowFraction),
@@ -43,10 +45,17 @@ public partial class SessionTimelineControl : UserControl
         double w = BarCanvas.ActualWidth;
         if (w <= 0) return;
 
+        // La fila crece cuando se muestra el horario bajo el nombre: la barra se
+        // centra contra la etiqueta en vez de quedar clavada arriba.
+        double h = BarCanvas.ActualHeight;
+        double barTop = (h - BarHeight) / 2;
+
         RailRect.Width = w;
+        RailRect.SetValue(Canvas.TopProperty, barTop);
 
         BarRect.Fill = vm.BarColor;
         BarRect.SetValue(Canvas.LeftProperty, vm.BarStart * w);
+        BarRect.SetValue(Canvas.TopProperty, barTop);
         BarRect.Width = vm.BarWidth * w;
 
         if (vm.HasMidnightCross)
@@ -54,6 +63,7 @@ public partial class SessionTimelineControl : UserControl
             BarRect2.Fill = vm.BarColor;
             BarRect2.Visibility = Visibility.Visible;
             BarRect2.SetValue(Canvas.LeftProperty, vm.BarStart2 * w);
+            BarRect2.SetValue(Canvas.TopProperty, barTop);
             BarRect2.Width = vm.BarWidth2 * w;
         }
         else
@@ -71,18 +81,21 @@ public partial class SessionTimelineControl : UserControl
             var rect = new Rectangle
             {
                 Width = overlay.BarWidth * w,
-                Height = 14,
+                Height = BarHeight,
                 Fill = overlay.Color,
-                Opacity = 0.85,
+                // Atenuado sobre una sesión cerrada: distingue "esto pasa ahora"
+                // de "acá caerá esta killzone cuando la sesión abra"
+                Opacity = vm.IsOpen ? 0.85 : 0.35,
                 RadiusX = 2,
                 RadiusY = 2
             };
             Canvas.SetLeft(rect, overlay.BarStart * w);
-            Canvas.SetTop(rect, 2);
+            Canvas.SetTop(rect, barTop);
             BarCanvas.Children.Add(rect);
             _overlayRects.Add(rect);
         }
 
+        NowLine.Height = h;
         NowLine.SetValue(Canvas.LeftProperty, NowFraction * w);
     }
 }

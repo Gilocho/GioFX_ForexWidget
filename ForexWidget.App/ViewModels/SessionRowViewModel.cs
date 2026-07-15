@@ -17,6 +17,9 @@ public partial class SessionRowViewModel : ObservableObject
     [ObservableProperty] private double _barWidth;    // 0.0 - 1.0
     [ObservableProperty] private string _openTimeUtc = "";
     [ObservableProperty] private string _closeTimeUtc = "";
+    // Horario open-close ya desplazado al modo de display (UTC/Local), como texto
+    [ObservableProperty] private string _timeRangeText = "";
+    [ObservableProperty] private bool _showSessionTimes;
     [ObservableProperty] private Brush _barColor = Brushes.Gray;
 
     // Sesiones que cruzan medianoche generan DOS barras — BarStart2/BarWidth2

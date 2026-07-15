@@ -57,8 +57,14 @@
 
             <!-- UTC / Local -->
             <CheckBox IsChecked="{Binding ShowLocalTime}"
-                      Margin="0,0,0,12">
+                      Margin="0,0,0,8">
                 <TextBlock Text="Show Local Time (instead of UTC)"/>
+            </CheckBox>
+
+            <!-- Horarios de sesión -->
+            <CheckBox IsChecked="{Binding ShowSessionTimes}"
+                      Margin="0,0,0,12">
+                <TextBlock Text="Show session open/close times"/>
             </CheckBox>
 
             <!-- Killzones -->

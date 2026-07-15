@@ -42,7 +42,8 @@ public class ConfigurationLoader : IConfigurationLoader
                     HolidayProvider = defaultSettings.HolidayProvider,
                     FinnhubApiKey = defaultSettings.FinnhubApiKey,
                     FMPApiKey = defaultSettings.FMPApiKey,
-                    Language = defaultSettings.Language
+                    Language = defaultSettings.Language,
+                    ShowSessionTimes = defaultSettings.ShowSessionTimes
                 };
                 File.WriteAllText(path, JsonSerializer.Serialize(dto, JsonOptions));
                 return defaultSettings;
@@ -61,7 +62,8 @@ public class ConfigurationLoader : IConfigurationLoader
                 HolidayProvider: loadedDto.HolidayProvider,
                 FinnhubApiKey: loadedDto.FinnhubApiKey,
                 FMPApiKey: loadedDto.FMPApiKey,
-                Language: loadedDto.Language
+                Language: loadedDto.Language,
+                ShowSessionTimes: loadedDto.ShowSessionTimes
             );
         }
         catch
@@ -161,7 +163,8 @@ public class ConfigurationLoader : IConfigurationLoader
                 HolidayProvider = settings.HolidayProvider,
                 FinnhubApiKey = settings.FinnhubApiKey,
                 FMPApiKey = settings.FMPApiKey,
-                Language = settings.Language
+                Language = settings.Language,
+                ShowSessionTimes = settings.ShowSessionTimes
             };
             File.WriteAllText(ConfigurationPaths.Settings(_configDirectory),
                 JsonSerializer.Serialize(dto, JsonOptions));
