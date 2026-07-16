@@ -22,7 +22,10 @@ Always-on-top desktop widget that shows you exactly what's happening in the Fore
 <a href="https://apps.microsoft.com/detail/ForexWidget/9PGXXRRQMZ0L">
   <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
 </a>
+
+
 ## Screenshots
+
 <img width="312" height="505" alt="Captura de pantalla 2026-07-15 183444" src="https://github.com/user-attachments/assets/0860a4f5-c99d-4cbb-910f-afdbb5842bdf" />
 <img width="305" height="496" alt="Captura de pantalla 2026-07-15 183420" src="https://github.com/user-attachments/assets/1b89e33c-bcd9-4d36-a370-b58aba996dc5" />
 <img width="312" height="507" alt="Captura de pantalla 2026-07-15 183430" src="https://github.com/user-attachments/assets/19918236-2e5f-4ca9-9640-bbe7c8158681" />
