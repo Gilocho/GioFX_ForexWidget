@@ -19,7 +19,9 @@ Always-on-top desktop widget that shows you exactly what's happening in the Fore
 - **System tray alerts** — get notified before killzones start, sessions open/close, or the weekend close approaches
 - **Live theme switching** — Dark/Light, applies instantly, no restart
 - **100% offline-first core** — the session/killzone/DST engine never touches the network; internet only enriches the experience, it's never a requirement
-
+<a href="https://apps.microsoft.com/detail/ForexWidget/9PGXXRRQMZ0L">
+  <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+</a>
 ## Screenshots
 <img width="312" height="505" alt="Captura de pantalla 2026-07-15 183444" src="https://github.com/user-attachments/assets/0860a4f5-c99d-4cbb-910f-afdbb5842bdf" />
 <img width="305" height="496" alt="Captura de pantalla 2026-07-15 183420" src="https://github.com/user-attachments/assets/1b89e33c-bcd9-4d36-a370-b58aba996dc5" />
@@ -31,9 +33,23 @@ Always-on-top desktop widget that shows you exactly what's happening in the Fore
 
 ## Installation
 
-**Coming soon:** signed `.msix` installer with automatic updates, available from the [Releases](../../releases) page.
+### Option 1 — Microsoft Store (recommended)
 
-### Run from source (available now)
+<a href="https://apps.microsoft.com/detail/ForexWidget/9PGXXRRQMZ0L">
+  <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200"/>
+</a>
+
+*Currently propagating through Microsoft's infrastructure post-certification — if the "Get" button isn't active yet, check back shortly, or use the direct download below in the meantime.*
+
+### Option 2 — Direct download (available now)
+
+Download from the [Releases](../../releases) page. You need **both** files:
+- `ForexWidget.msix`
+- `ForexWidget.appinstaller`
+
+**Open `ForexWidget.appinstaller`** (not the `.msix` directly) to install — this is what enables automatic future updates. If you install the `.msix` directly, the app will work but won't check for updates on its own.
+
+### Option 3 — Run from source (for developers)
 
 Requirements: [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0), Windows 10/11.
 
@@ -43,8 +59,6 @@ cd GioFX_ForexWidget
 dotnet build
 dotnet run --project ForexWidget.App
 ```
-
----
 
 ## Architecture
 
