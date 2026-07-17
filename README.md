@@ -28,8 +28,8 @@ Always-on-top desktop widget that shows you exactly what's happening in the Fore
 
 <img width="312" height="505" alt="Captura de pantalla 2026-07-15 183444" src="https://github.com/user-attachments/assets/0860a4f5-c99d-4cbb-910f-afdbb5842bdf" />
 <img width="305" height="496" alt="Captura de pantalla 2026-07-15 183420" src="https://github.com/user-attachments/assets/1b89e33c-bcd9-4d36-a370-b58aba996dc5" />
-<img width="312" height="507" alt="Captura de pantalla 2026-07-15 183430" src="https://github.com/user-attachments/assets/19918236-2e5f-4ca9-9640-bbe7c8158681" />
-
+<img width="288" height="466" alt="Captura de pantalla 2026-07-17 153544" src="https://github.com/user-attachments/assets/21fda704-aa04-4465-8044-0d6683236a49" />
+<img width="318" height="168" alt="Captura de pantalla 2026-07-17 153527" src="https://github.com/user-attachments/assets/b8761f93-0483-4a0a-84da-ca5db5455560" />
 
 
 ---
