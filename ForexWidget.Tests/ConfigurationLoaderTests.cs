@@ -164,6 +164,36 @@ public class ConfigurationLoaderTests
     }
 
     [Fact]
+    public void Case11_CustomKillzoneWithMarket_RoundTripsIdentical()
+    {
+        string dir = CreateTempConfigDir();
+        var loader = new ConfigurationLoader(dir);
+        var custom = new ForexWidget.Domain.Models.KillzoneDefinition(
+            "My London KZ", new TimeOnly(7, 30), new TimeOnly(9, 45),
+            "#AA44FF", "Custom", Enabled: true,
+            IsCustom: true, AssociatedMarket: "London");
+
+        loader.SaveKillzones([custom]);
+        var reloaded = loader.LoadKillzones();
+
+        Assert.Single(reloaded);
+        Assert.Equal(custom, reloaded[0]);
+        Directory.Delete(dir, true);
+    }
+
+    [Fact]
+    public void Case12_DefaultKillzones_AllHaveIsCustomFalse()
+    {
+        string dir = CreateTempConfigDir();
+        var loader = new ConfigurationLoader(dir);
+        var defaults = loader.LoadKillzones();
+
+        Assert.Equal(5, defaults.Count);
+        Assert.All(defaults, kz => Assert.False(kz.IsCustom));
+        Directory.Delete(dir, true);
+    }
+
+    [Fact]
     public void Case10_TimeOnlyParsedCorrectly()
     {
         string dir = CreateTempConfigDir();

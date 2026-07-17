@@ -29,7 +29,9 @@
         <StackPanel Margin="12">
 
             <!-- ── HEADER: Reloj + Botón cerrar ── -->
-            <Grid>
+            <!-- En minimalista se oculta entero: el reloj baja en chiquito al pie
+                 del timeline y los botones suben a la fila de SESSIONS -->
+            <Grid Visibility="{Binding IsMinimalistMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -78,7 +80,8 @@
                 </StackPanel>
             </Grid>
 
-            <Separator Margin="0,8,0,8"/>
+            <Separator Margin="0,8,0,8"
+                       Visibility="{Binding IsMinimalistMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
 
             <!-- ── WEEKEND CLOSED BANNER ── -->
             <Border Background="#2A0A0A"
@@ -104,9 +107,47 @@
             </Border>
 
             <!-- ── SESSION TIMELINE ── -->
-            <TextBlock Text="{Binding TimeDisplayLabel, StringFormat='SESSIONS  ({0})'}"
-                       Style="{DynamicResource LabelSecondary}"
-                       Margin="0,0,0,4"/>
+            <!-- En minimalista los botones ♥/⚙/✕ viven en esta fila (esquina sup. derecha);
+                 en modo normal siguen en el header y aquí quedan colapsados -->
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="{Binding TimeDisplayLabel, StringFormat='SESSIONS  ({0})'}"
+                           Style="{DynamicResource LabelSecondary}"
+                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal"
+                            Visibility="{Binding IsMinimalistMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Button Command="{Binding OpenSupportCommand}"
+                            Content="♥"
+                            Background="Transparent"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            BorderThickness="0"
+                            FontSize="11"
+                            Padding="2,0"
+                            Cursor="Hand"
+                            Margin="0,0,6,0"/>
+                    <Button Command="{Binding OpenSettingsCommand}"
+                            Content="⚙"
+                            Background="Transparent"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            BorderThickness="0"
+                            FontSize="11"
+                            Padding="2,0"
+                            Cursor="Hand"
+                            Margin="0,0,6,0"/>
+                    <Button Command="{Binding CloseAppCommand}"
+                            Content="✕"
+                            Background="Transparent"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            BorderThickness="0"
+                            FontSize="11"
+                            Padding="2,0"
+                            Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
 
             <!-- Marcadores de hora, alineados con la columna de barras -->
             <Grid Margin="0,0,0,2">
@@ -140,8 +181,28 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <!-- Reloj + fecha compactos al pie del timeline, solo en minimalista
+                 (reemplazan al header completo, que en este modo está oculto) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0"
+                        Visibility="{Binding IsMinimalistMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBlock Text="{Binding CurrentTimeUtc}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           FontSize="10"
+                           FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding TimeDisplayLabel}"
+                           Style="{DynamicResource LabelSecondary}"
+                           FontSize="9"
+                           Margin="4,0,0,0"
+                           VerticalAlignment="Bottom"/>
+                <TextBlock Text="{Binding CurrentDateUtc, StringFormat=' · {0}'}"
+                           Style="{DynamicResource LabelSecondary}"
+                           FontSize="9"
+                           VerticalAlignment="Bottom"/>
+            </StackPanel>
+
             <!-- Leyenda de killzones habilitadas: qué color es cuál en el overlay -->
-            <ItemsControl ItemsSource="{Binding KillzoneLegend}" Margin="55,4,0,0">
+            <ItemsControl ItemsSource="{Binding KillzoneLegend}" Margin="55,4,0,0"
+                          Visibility="{Binding IsMinimalistMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal"/>
@@ -162,6 +223,9 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <!-- Todo lo de abajo se oculta completo en modo minimalista -->
+            <StackPanel Visibility="{Binding IsMinimalistMode, Converter={StaticResource InverseBoolToVisibilityConverter}}">
 
             <Separator Margin="0,8,0,8"/>
 
@@ -318,6 +382,9 @@
                        HorizontalAlignment="Center"
                        Margin="0,8,0,0"
                        Opacity="0.4"/>
+
+            </StackPanel>
+            <!-- Fin del bloque oculto en modo minimalista -->
         </StackPanel>
     </Border>
 </Window>

@@ -16,6 +16,16 @@ public class BoolToVisibilityConverter : IValueConverter
         => throw new NotImplementedException();
 }
 
+// bool -> Visibility invertido (true -> Collapsed) — para ocultar secciones en modo minimalista
+public class InverseBoolToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        => value is true ? Visibility.Collapsed : Visibility.Visible;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
 // int count -> Visibility (visible si count > 0)
 public class CountToVisibilityConverter : IValueConverter
 {

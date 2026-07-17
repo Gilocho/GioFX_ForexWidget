@@ -11,4 +11,5 @@ public class AppSettingsDto
     public string FMPApiKey       { get; set; } = "";
     public string Language        { get; set; } = "en";
     public bool   ShowSessionTimes { get; set; } = false;
+    public bool   MinimalistMode   { get; set; } = false;
 }

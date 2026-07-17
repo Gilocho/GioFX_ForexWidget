@@ -9,7 +9,8 @@ public record AppSettings(
     string FinnhubApiKey,
     string FMPApiKey,
     string Language,
-    bool ShowSessionTimes
+    bool ShowSessionTimes,
+    bool MinimalistMode
 )
 {
     public static AppSettings Default => new(
@@ -21,6 +22,7 @@ public record AppSettings(
         FinnhubApiKey: "",
         FMPApiKey: "",
         Language: "en",
-        ShowSessionTimes: false
+        ShowSessionTimes: false,
+        MinimalistMode: false
     );
 }

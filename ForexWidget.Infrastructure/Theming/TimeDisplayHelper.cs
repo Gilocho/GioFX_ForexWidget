@@ -39,6 +39,18 @@ public static class TimeDisplayHelper
     }
 
     /// <summary>
+    /// Inverse of ToDisplayTimeOnly — converts a time entered in the current
+    /// display mode (Local or UTC) back to UTC for storage.
+    /// Wraps correctly across midnight.
+    /// </summary>
+    public static TimeOnly ToUtcTimeOnly(TimeOnly displayTime, TimeSpan offset)
+    {
+        int totalMinutes = displayTime.Hour * 60 + displayTime.Minute - (int)offset.TotalMinutes;
+        totalMinutes = ((totalMinutes % 1440) + 1440) % 1440;
+        return new TimeOnly(totalMinutes / 60, totalMinutes % 60);
+    }
+
+    /// <summary>
     /// Returns the offset to apply for display purposes.
     /// TimeSpan.Zero if displayMode is "UTC" (or anything other than "Local").
     /// The machine's current local UTC offset (DST-aware) if displayMode is "Local".

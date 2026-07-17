@@ -15,4 +15,6 @@ public class KillzoneDto
     public string Color       { get; set; } = "#FFFFFF";
     public string Methodology { get; set; } = "Custom";
     public bool   Enabled     { get; set; } = true;
+    public bool    IsCustom         { get; set; } = false;
+    public string? AssociatedMarket { get; set; } = null;
 }

@@ -63,18 +63,24 @@
 
             <!-- Horarios de sesión -->
             <CheckBox IsChecked="{Binding ShowSessionTimes}"
-                      Margin="0,0,0,12">
+                      Margin="0,0,0,8">
                 <TextBlock Text="Show session open/close times"/>
             </CheckBox>
 
-            <!-- Killzones -->
+            <!-- Modo minimalista -->
+            <CheckBox IsChecked="{Binding MinimalistMode}"
+                      Margin="0,0,0,12">
+                <TextBlock Text="Minimalist mode (bars only)"/>
+            </CheckBox>
+
+            <!-- Killzones (MMM + personalizadas mezcladas; solo las custom se pueden borrar) -->
             <TextBlock Text="Killzones" Style="{DynamicResource LabelSecondary}" Margin="0,0,0,4"/>
-            <ItemsControl ItemsSource="{Binding Killzones}" Margin="0,0,0,12">
+            <ItemsControl ItemsSource="{Binding Killzones}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0,2">
                             <CheckBox IsChecked="{Binding IsEnabled}" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding DisplayLabel}"/>
                             </CheckBox>
                             <Rectangle Width="16" Height="16"
                                        Fill="{Binding ColorBrush}"
@@ -86,10 +92,94 @@
                                        VerticalAlignment="Center"
                                        MouseLeftButtonDown="ColorSwatch_Click"
                                        Tag="{Binding}"/>
+                            <Button Content="🗑"
+                                    Command="{Binding DataContext.DeleteCustomKillzoneCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Visibility="{Binding IsCustom, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Background="Transparent"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    BorderThickness="0"
+                                    FontSize="11"
+                                    Cursor="Hand"
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <!-- Alta de killzone personalizada (máx. 5) -->
+            <Button Content="+ Add Custom Killzone"
+                    Command="{Binding AddCustomKillzoneCommand}"
+                    IsEnabled="{Binding CanAddCustomKillzone}"
+                    Background="Transparent"
+                    Foreground="{DynamicResource TextSecondaryBrush}"
+                    BorderBrush="{DynamicResource PrimaryBrush}"
+                    BorderThickness="1"
+                    Padding="8,3"
+                    HorizontalAlignment="Left"
+                    Cursor="Hand"
+                    Margin="0,8,0,0"/>
+
+            <StackPanel Visibility="{Binding IsAddingKillzone, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Margin="0,8,0,0">
+                <TextBlock Text="Name" Style="{DynamicResource LabelSecondary}" Margin="0,0,0,2"/>
+                <TextBox Text="{Binding NewKillzoneName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,6"/>
+
+                <TextBlock Text="{Binding TimeInputModeLabel}"
+                           Style="{DynamicResource LabelSecondary}"
+                           FontSize="9" Opacity="0.7"
+                           Margin="0,0,0,4"/>
+
+                <Grid Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Start (HH:mm)" Style="{DynamicResource LabelSecondary}" FontSize="9" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding NewKillzoneStartText, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="End (HH:mm)" Style="{DynamicResource LabelSecondary}" FontSize="9" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding NewKillzoneEndText, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="Market (label only)" Style="{DynamicResource LabelSecondary}" FontSize="9" Margin="0,0,0,2"/>
+                <ComboBox ItemsSource="{Binding MarketOptions}"
+                          SelectedItem="{Binding NewKillzoneMarket}"
+                          Margin="0,0,0,6"/>
+
+                <TextBlock Text="{Binding KillzoneFormError}"
+                           Foreground="{DynamicResource AccentBrush}"
+                           FontSize="10"
+                           TextWrapping="Wrap"
+                           Visibility="{Binding KillzoneFormError, Converter={StaticResource StringNotEmptyToVisibilityConverter}}"
+                           Margin="0,0,0,6"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancel"
+                            Command="{Binding CancelNewKillzoneCommand}"
+                            Background="Transparent"
+                            Foreground="{DynamicResource TextSecondaryBrush}"
+                            BorderBrush="{DynamicResource PrimaryBrush}"
+                            BorderThickness="1"
+                            Padding="10,3" Margin="0,0,8,0"
+                            Cursor="Hand"/>
+                    <Button Content="Save"
+                            Command="{Binding SaveNewKillzoneCommand}"
+                            Background="{DynamicResource PrimaryBrush}"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            BorderThickness="0"
+                            Padding="10,3"
+                            Cursor="Hand"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Separator Margin="0,12,0,12"/>
 
             <!-- Botones -->
             <Grid>

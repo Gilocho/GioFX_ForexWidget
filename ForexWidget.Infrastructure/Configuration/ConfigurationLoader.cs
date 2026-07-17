@@ -43,7 +43,8 @@ public class ConfigurationLoader : IConfigurationLoader
                     FinnhubApiKey = defaultSettings.FinnhubApiKey,
                     FMPApiKey = defaultSettings.FMPApiKey,
                     Language = defaultSettings.Language,
-                    ShowSessionTimes = defaultSettings.ShowSessionTimes
+                    ShowSessionTimes = defaultSettings.ShowSessionTimes,
+                    MinimalistMode = defaultSettings.MinimalistMode
                 };
                 File.WriteAllText(path, JsonSerializer.Serialize(dto, JsonOptions));
                 return defaultSettings;
@@ -63,7 +64,8 @@ public class ConfigurationLoader : IConfigurationLoader
                 FinnhubApiKey: loadedDto.FinnhubApiKey,
                 FMPApiKey: loadedDto.FMPApiKey,
                 Language: loadedDto.Language,
-                ShowSessionTimes: loadedDto.ShowSessionTimes
+                ShowSessionTimes: loadedDto.ShowSessionTimes,
+                MinimalistMode: loadedDto.MinimalistMode
             );
         }
         catch
@@ -89,7 +91,9 @@ public class ConfigurationLoader : IConfigurationLoader
                         EndUtc = d.EndUtc.ToString("HH:mm"),
                         Color = d.Color,
                         Methodology = d.Methodology,
-                        Enabled = d.Enabled
+                        Enabled = d.Enabled,
+                        IsCustom = d.IsCustom,
+                        AssociatedMarket = d.AssociatedMarket
                     }).ToList()
                 };
                 File.WriteAllText(path, JsonSerializer.Serialize(dtoWrapper, JsonOptions));
@@ -106,7 +110,9 @@ public class ConfigurationLoader : IConfigurationLoader
             {
                 TimeOnly start = TimeOnly.ParseExact(kz.StartUtc, "HH:mm", null);
                 TimeOnly end = TimeOnly.ParseExact(kz.EndUtc, "HH:mm", null);
-                result.Add(new KillzoneDefinition(kz.Name, start, end, kz.Color, kz.Methodology, kz.Enabled));
+                result.Add(new KillzoneDefinition(
+                    kz.Name, start, end, kz.Color, kz.Methodology, kz.Enabled,
+                    kz.IsCustom, kz.AssociatedMarket));
             }
             return result;
         }
@@ -164,7 +170,8 @@ public class ConfigurationLoader : IConfigurationLoader
                 FinnhubApiKey = settings.FinnhubApiKey,
                 FMPApiKey = settings.FMPApiKey,
                 Language = settings.Language,
-                ShowSessionTimes = settings.ShowSessionTimes
+                ShowSessionTimes = settings.ShowSessionTimes,
+                MinimalistMode = settings.MinimalistMode
             };
             File.WriteAllText(ConfigurationPaths.Settings(_configDirectory),
                 JsonSerializer.Serialize(dto, JsonOptions));
@@ -188,7 +195,9 @@ public class ConfigurationLoader : IConfigurationLoader
                     EndUtc = d.EndUtc.ToString("HH:mm"),
                     Color = d.Color,
                     Methodology = d.Methodology,
-                    Enabled = d.Enabled
+                    Enabled = d.Enabled,
+                    IsCustom = d.IsCustom,
+                    AssociatedMarket = d.AssociatedMarket
                 }).ToList()
             };
             File.WriteAllText(ConfigurationPaths.Killzones(_configDirectory),
@@ -200,13 +209,14 @@ public class ConfigurationLoader : IConfigurationLoader
         }
     }
 
+    // IsCustom: false explícito — las MMM nunca deben poder borrarse por confundirse con custom
     private static IReadOnlyList<KillzoneDefinition> DefaultKillzones() =>
     [
-        new("London Open",       new TimeOnly( 6, 0), new TimeOnly( 9, 0), "#00AA00", "MMM", true),
-        new("New York Open",     new TimeOnly(12, 0), new TimeOnly(15, 0), "#FF8800", "MMM", true),
-        new("London-NY Overlap", new TimeOnly(12, 0), new TimeOnly(16, 0), "#00FFAA", "MMM", true),
-        new("Asian Killzone",    new TimeOnly( 0, 0), new TimeOnly( 3, 0), "#4488FF", "MMM", true),
-        new("London Close",      new TimeOnly(15, 0), new TimeOnly(16, 0), "#FF4444", "MMM", true),
+        new("London Open",       new TimeOnly( 6, 0), new TimeOnly( 9, 0), "#00AA00", "MMM", true, IsCustom: false),
+        new("New York Open",     new TimeOnly(12, 0), new TimeOnly(15, 0), "#FF8800", "MMM", true, IsCustom: false),
+        new("London-NY Overlap", new TimeOnly(12, 0), new TimeOnly(16, 0), "#00FFAA", "MMM", true, IsCustom: false),
+        new("Asian Killzone",    new TimeOnly( 0, 0), new TimeOnly( 3, 0), "#4488FF", "MMM", true, IsCustom: false),
+        new("London Close",      new TimeOnly(15, 0), new TimeOnly(16, 0), "#FF4444", "MMM", true, IsCustom: false),
     ];
 
     private static IReadOnlyList<AlertDefinition> DefaultAlerts() =>

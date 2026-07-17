@@ -70,6 +70,34 @@ public class TimeDisplayHelperTests
     }
 
     [Fact]
+    public void ToUtcTimeOnly_16LocalMinus5_StoresAs21Utc()
+    {
+        Assert.Equal(new TimeOnly(21, 0),
+            TimeDisplayHelper.ToUtcTimeOnly(new TimeOnly(16, 0), TimeSpan.FromHours(-5)));
+    }
+
+    [Fact]
+    public void ToUtcTimeOnly_18LocalMinus5_StoresAs23Utc()
+    {
+        Assert.Equal(new TimeOnly(23, 0),
+            TimeDisplayHelper.ToUtcTimeOnly(new TimeOnly(18, 0), TimeSpan.FromHours(-5)));
+    }
+
+    [Fact]
+    public void ToUtcTimeOnly_21LocalMinus5_WrapsTo02NextDay()
+    {
+        Assert.Equal(new TimeOnly(2, 0),
+            TimeDisplayHelper.ToUtcTimeOnly(new TimeOnly(21, 0), TimeSpan.FromHours(-5)));
+    }
+
+    [Fact]
+    public void ToUtcTimeOnly_NoonPlus9_StoresAs03Utc()
+    {
+        Assert.Equal(new TimeOnly(3, 0),
+            TimeDisplayHelper.ToUtcTimeOnly(new TimeOnly(12, 0), TimeSpan.FromHours(9)));
+    }
+
+    [Fact]
     public void Case5_GetDisplayOffsetUtc_ReturnsZero()
     {
         Assert.Equal(TimeSpan.Zero, TimeDisplayHelper.GetDisplayOffset("UTC", Now));

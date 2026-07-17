@@ -82,6 +82,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _windowOpacity = 0.95;
     [ObservableProperty] private string _timeDisplayLabel = "UTC";
     [ObservableProperty] private string _nextKillzoneText = "";
+    [ObservableProperty] private bool _isMinimalistMode;
 
     // La versión del paquete no cambia en caliente: se lee una sola vez, no en cada refresh
     public string AppVersionText { get; } = AppVersionHelper.GetDisplayVersion();
@@ -126,6 +127,7 @@ public partial class MainViewModel : ObservableObject
         var startupSettings = _configLoader.LoadSettings();
         WindowOpacity = Math.Clamp(startupSettings.Opacity, 0.5, 1.0);
         _timeDisplayMode = startupSettings.TimeDisplay;
+        IsMinimalistMode = startupSettings.MinimalistMode;
 
         _scheduler = new DispatcherScheduler(TimeSpan.FromSeconds(30));
         _scheduler.Tick += Refresh;
@@ -185,6 +187,7 @@ public partial class MainViewModel : ObservableObject
         // ── Modo de display (UTC/Local) desde settings, luego reloj ────
         var settings = _configLoader.LoadSettings();
         _timeDisplayMode = settings.TimeDisplay;
+        IsMinimalistMode = settings.MinimalistMode; // aplica en vivo: onSaved dispara Refresh
         UpdateClockOnly();
         var displayOffset = TimeDisplayHelper.GetDisplayOffset(_timeDisplayMode, utcNow);
 
