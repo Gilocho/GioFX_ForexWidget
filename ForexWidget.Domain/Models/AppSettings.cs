@@ -1,5 +1,7 @@
 ﻿namespace ForexWidget.Domain.Models;
 
+using ForexWidget.Domain.Enums;
+
 public record AppSettings(
     string Theme,
     bool AlwaysOnTop,
@@ -10,7 +12,8 @@ public record AppSettings(
     string FMPApiKey,
     string Language,
     bool ShowSessionTimes,
-    bool MinimalistMode
+    bool MinimalistMode,
+    ViewMode ViewMode
 )
 {
     public static AppSettings Default => new(
@@ -23,6 +26,7 @@ public record AppSettings(
         FMPApiKey: "",
         Language: "en",
         ShowSessionTimes: false,
-        MinimalistMode: false
+        MinimalistMode: false,
+        ViewMode: ViewMode.Bars
     );
 }

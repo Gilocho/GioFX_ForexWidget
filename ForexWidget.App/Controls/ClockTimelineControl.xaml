@@ -1,0 +1,75 @@
+<UserControl x:Class="ForexWidget.App.Controls.ClockTimelineControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="230" d:DesignWidth="296">
+
+    <Grid>
+        <!-- Los anillos, arcos y la manecilla los dibuja Redraw() en code-behind
+             (misma excepción MVVM ya aceptada para SessionTimelineControl:
+             geometría pura que los bindings de WPF no pueden expresar) -->
+        <Canvas x:Name="ClockCanvas"
+                Height="250"
+                SizeChanged="ClockCanvas_SizeChanged"/>
+
+        <!-- Centro del reloj (Sprint 12.1): SOLO la hora, grande y limpia.
+             Únicamente en minimalista — en modo completo el header ya tiene
+             el reloj grande y sería un reloj duplicado. -->
+        <TextBlock Text="{Binding CurrentTimeUtc}"
+                   Style="{DynamicResource ClockStyle}"
+                   FontSize="18"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsHitTestVisible="False"
+                   Visibility="{Binding IsMinimalistMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <!-- Badge compacto de mercado cerrado (reemplaza al banner de ancho
+             completo en modo Clock), esquina superior izquierda del área -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="4,2,0,0"
+                    IsHitTestVisible="False"
+                    Visibility="{Binding IsWeekendClosed, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Ellipse Width="7" Height="7"
+                     Fill="{DynamicResource AccentBrush}"
+                     Margin="0,0,4,0"
+                     VerticalAlignment="Center"/>
+            <TextBlock Text="Market Closed"
+                       FontSize="9"
+                       FontWeight="Bold"
+                       Foreground="{DynamicResource AccentBrush}"/>
+        </StackPanel>
+
+        <!-- Fecha reubicada del centro a la esquina inferior izquierda
+             (solo minimalista: en completo la fecha ya está en el header) -->
+        <TextBlock Text="{Binding CurrentDateUtc}"
+                   Style="{DynamicResource LabelSecondary}"
+                   FontSize="9"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Margin="4,0,0,2"
+                   IsHitTestVisible="False"
+                   Visibility="{Binding IsMinimalistMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <!-- Próximo milestone reubicado a la esquina inferior derecha
+             (solo minimalista: en completo ya existe la fila NEXT MILESTONE) -->
+        <StackPanel HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,4,2"
+                    IsHitTestVisible="False"
+                    Visibility="{Binding IsMinimalistMode, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="{Binding NextMilestone}"
+                       Style="{DynamicResource LabelSecondary}"
+                       FontSize="9"
+                       HorizontalAlignment="Right"/>
+            <TextBlock Text="{Binding NextMilestoneTime}"
+                       Style="{DynamicResource LabelSecondary}"
+                       FontSize="9"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Right"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -12,6 +12,7 @@
             <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
             <converters:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
             <converters:StringNotEmptyToVisibilityConverter x:Key="StringNotEmptyToVisibilityConverter"/>
+            <converters:ViewModeToVisibilityConverter x:Key="ViewModeToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

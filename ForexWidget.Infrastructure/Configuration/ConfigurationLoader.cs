@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using ForexWidget.Domain.Enums;
 using ForexWidget.Domain.Interfaces;
 using ForexWidget.Domain.Models;
 using ForexWidget.Infrastructure.Dto;
@@ -44,7 +45,8 @@ public class ConfigurationLoader : IConfigurationLoader
                     FMPApiKey = defaultSettings.FMPApiKey,
                     Language = defaultSettings.Language,
                     ShowSessionTimes = defaultSettings.ShowSessionTimes,
-                    MinimalistMode = defaultSettings.MinimalistMode
+                    MinimalistMode = defaultSettings.MinimalistMode,
+                    ViewMode = defaultSettings.ViewMode.ToString()
                 };
                 File.WriteAllText(path, JsonSerializer.Serialize(dto, JsonOptions));
                 return defaultSettings;
@@ -54,7 +56,8 @@ public class ConfigurationLoader : IConfigurationLoader
             var loadedDto = JsonSerializer.Deserialize<AppSettingsDto>(json, JsonOptions);
             
             if (loadedDto == null) return AppSettings.Default;
-            
+
+            var (viewMode, minimalist) = ResolveViewSettings(loadedDto.ViewMode, loadedDto.MinimalistMode);
             return new AppSettings(
                 Theme: loadedDto.Theme,
                 AlwaysOnTop: loadedDto.AlwaysOnTop,
@@ -65,13 +68,33 @@ public class ConfigurationLoader : IConfigurationLoader
                 FMPApiKey: loadedDto.FMPApiKey,
                 Language: loadedDto.Language,
                 ShowSessionTimes: loadedDto.ShowSessionTimes,
-                MinimalistMode: loadedDto.MinimalistMode
+                MinimalistMode: minimalist,
+                ViewMode: viewMode
             );
         }
         catch
         {
             return AppSettings.Default;
         }
+    }
+
+    // ViewMode y MinimalistMode son ejes independientes (forma del timeline
+    // vs. compacidad). Dos migraciones que no deben perder la preferencia:
+    // - pre-Sprint 12: solo existe MinimalistMode (bool) → se respeta tal cual
+    //   y ViewMode ausente cae a Bars.
+    // - intermedio de Sprint 12: ViewMode fue brevemente un enum de 3 valores
+    //   con "Minimalist" → se mapea a Bars + minimalista activado.
+    private static (ViewMode ViewMode, bool Minimalist) ResolveViewSettings(
+        string? viewMode, bool minimalistMode)
+    {
+        if (string.Equals(viewMode, "Minimalist", StringComparison.OrdinalIgnoreCase))
+            return (ViewMode.Bars, true);
+
+        if (Enum.TryParse<ViewMode>(viewMode, ignoreCase: true, out var parsed)
+            && Enum.IsDefined(parsed))
+            return (parsed, minimalistMode);
+
+        return (ViewMode.Bars, minimalistMode);
     }
 
     public IReadOnlyList<KillzoneDefinition> LoadKillzones()
@@ -171,7 +194,8 @@ public class ConfigurationLoader : IConfigurationLoader
                 FMPApiKey = settings.FMPApiKey,
                 Language = settings.Language,
                 ShowSessionTimes = settings.ShowSessionTimes,
-                MinimalistMode = settings.MinimalistMode
+                MinimalistMode = settings.MinimalistMode,
+                ViewMode = settings.ViewMode.ToString()
             };
             File.WriteAllText(ConfigurationPaths.Settings(_configDirectory),
                 JsonSerializer.Serialize(dto, JsonOptions));

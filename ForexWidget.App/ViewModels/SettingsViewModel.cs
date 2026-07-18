@@ -2,6 +2,7 @@ namespace ForexWidget.App.ViewModels;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ForexWidget.Domain.Enums;
 using ForexWidget.Domain.Interfaces;
 using ForexWidget.Domain.Models;
 using ForexWidget.Infrastructure;
@@ -62,6 +63,11 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _showLocalTime;
     [ObservableProperty] private bool _showSessionTimes;
     [ObservableProperty] private bool _minimalistMode;
+    // "Selected" evita el choque nombre-de-propiedad == nombre-de-tipo (ViewMode)
+    [ObservableProperty] private ViewMode _selectedViewMode = ViewMode.Bars;
+
+    public IReadOnlyList<ViewMode> ViewModeOptions { get; } =
+        [ViewMode.Bars, ViewMode.Clock];
 
     // ── Alta de killzones personalizadas ─────────────────────────────
     [ObservableProperty] private bool _isAddingKillzone;
@@ -98,6 +104,7 @@ public partial class SettingsViewModel : ObservableObject
         ShowLocalTime = string.Equals(_original.TimeDisplay, "Local", StringComparison.OrdinalIgnoreCase);
         ShowSessionTimes = _original.ShowSessionTimes;
         MinimalistMode = _original.MinimalistMode;
+        SelectedViewMode = _original.ViewMode;
         UpdateTimeInputModeLabel();
 
         foreach (var kz in configLoader.LoadKillzones())
@@ -201,7 +208,8 @@ public partial class SettingsViewModel : ObservableObject
             Opacity = Opacity,
             TimeDisplay = ShowLocalTime ? "Local" : "UTC",
             ShowSessionTimes = ShowSessionTimes,
-            MinimalistMode = MinimalistMode
+            MinimalistMode = MinimalistMode,
+            ViewMode = SelectedViewMode
         };
         _configLoader.SaveSettings(updated);
 

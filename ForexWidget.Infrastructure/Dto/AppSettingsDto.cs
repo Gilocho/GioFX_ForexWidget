@@ -12,4 +12,9 @@ public class AppSettingsDto
     public string Language        { get; set; } = "en";
     public bool   ShowSessionTimes { get; set; } = false;
     public bool   MinimalistMode   { get; set; } = false;
+
+    // null = archivo pre-Sprint 12 sin el campo → ViewMode.Bars.
+    // El valor "Minimalist" (enum intermedio de 3 valores que existió durante
+    // el desarrollo de Sprint 12) también se acepta y migra — ver el loader.
+    public string? ViewMode        { get; set; } = null;
 }

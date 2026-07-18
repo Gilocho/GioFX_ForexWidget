@@ -83,12 +83,13 @@
             <Separator Margin="0,8,0,8"
                        Visibility="{Binding IsMinimalistMode, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
 
-            <!-- ── WEEKEND CLOSED BANNER ── -->
+            <!-- ── WEEKEND CLOSED BANNER (solo vista Barras; en Clock es un
+                 badge compacto dentro del dial — Sprint 12.1) ── -->
             <Border Background="#2A0A0A"
                     CornerRadius="4"
                     Padding="8,6"
                     Margin="0,0,0,8"
-                    Visibility="{Binding IsWeekendClosed, Converter={StaticResource BoolToVisibilityConverter}}">
+                    Visibility="{Binding ShowWeekendBanner, Converter={StaticResource BoolToVisibilityConverter}}">
                 <TextBlock Text="⛔  MARKET CLOSED — Weekend"
                            Foreground="{DynamicResource AccentBrush}"
                            FontWeight="Bold"
@@ -149,6 +150,11 @@
                 </StackPanel>
             </Grid>
 
+            <!-- Vista Barras: marcadores de hora + filas. Vista Clock: el reloj
+                 circular de abajo. Mismo Sessions como fuente en ambas — solo
+                 cambia qué control lo renderiza. Minimalista es eje aparte. -->
+            <StackPanel Visibility="{Binding CurrentViewMode, Converter={StaticResource ViewModeToVisibilityConverter}, ConverterParameter=Bars}">
+
             <!-- Marcadores de hora, alineados con la columna de barras -->
             <Grid Margin="0,0,0,2">
                 <Grid.ColumnDefinitions>
@@ -181,10 +187,20 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            </StackPanel>
+            <!-- Fin vista Barras -->
+
+            <!-- Vista Clock: reloj de 24h con anillos por sesión (Sprint 12) -->
+            <controls:ClockTimelineControl
+                Margin="0,4,0,0"
+                SessionsSource="{Binding Sessions}"
+                NowFraction="{Binding NowLinePosition}"
+                Visibility="{Binding CurrentViewMode, Converter={StaticResource ViewModeToVisibilityConverter}, ConverterParameter=Clock}"/>
+
             <!-- Reloj + fecha compactos al pie del timeline, solo en minimalista
-                 (reemplazan al header completo, que en este modo está oculto) -->
+                 con BARRAS (con reloj circular la hora ya vive en el centro del dial) -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0"
-                        Visibility="{Binding IsMinimalistMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                        Visibility="{Binding ShowMinimalistFooterClock, Converter={StaticResource BoolToVisibilityConverter}}">
                 <TextBlock Text="{Binding CurrentTimeUtc}"
                            Foreground="{DynamicResource TextPrimaryBrush}"
                            FontSize="10"

@@ -68,6 +68,9 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _nextMilestone = "";
     [ObservableProperty] private string _nextMilestoneTime = "";
     [ObservableProperty] private bool _isWeekendClosed;
+    // El banner de ancho completo solo en modo Barras; en Clock lo reemplaza
+    // el badge compacto dentro del dial (Sprint 12.1)
+    [ObservableProperty] private bool _showWeekendBanner;
     [ObservableProperty] private bool _isDstWarningActive;
     [ObservableProperty] private string _dstWarningMessage = "";
     [ObservableProperty] private double _nowLinePosition; // 0.0 - 1.0 fracción de 24h
@@ -83,6 +86,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _timeDisplayLabel = "UTC";
     [ObservableProperty] private string _nextKillzoneText = "";
     [ObservableProperty] private bool _isMinimalistMode;
+    [ObservableProperty] private ViewMode _currentViewMode = ViewMode.Bars;
+    // El reloj chico al pie (Sprint 11) solo aplica en minimalista con BARRAS:
+    // en minimalista con reloj la hora ya está en el centro del dial
+    [ObservableProperty] private bool _showMinimalistFooterClock;
 
     // La versión del paquete no cambia en caliente: se lee una sola vez, no en cada refresh
     public string AppVersionText { get; } = AppVersionHelper.GetDisplayVersion();
@@ -127,7 +134,7 @@ public partial class MainViewModel : ObservableObject
         var startupSettings = _configLoader.LoadSettings();
         WindowOpacity = Math.Clamp(startupSettings.Opacity, 0.5, 1.0);
         _timeDisplayMode = startupSettings.TimeDisplay;
-        IsMinimalistMode = startupSettings.MinimalistMode;
+        ApplyViewSettings(startupSettings);
 
         _scheduler = new DispatcherScheduler(TimeSpan.FromSeconds(30));
         _scheduler.Tick += Refresh;
@@ -166,6 +173,13 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private void ApplyViewSettings(AppSettings settings)
+    {
+        CurrentViewMode = settings.ViewMode;
+        IsMinimalistMode = settings.MinimalistMode;
+        ShowMinimalistFooterClock = settings.MinimalistMode && settings.ViewMode == ViewMode.Bars;
+    }
+
     // SOLO reloj y línea NOW — nada de motor de mercado. Corre cada 1s.
     private void UpdateClockOnly()
     {
@@ -187,13 +201,14 @@ public partial class MainViewModel : ObservableObject
         // ── Modo de display (UTC/Local) desde settings, luego reloj ────
         var settings = _configLoader.LoadSettings();
         _timeDisplayMode = settings.TimeDisplay;
-        IsMinimalistMode = settings.MinimalistMode; // aplica en vivo: onSaved dispara Refresh
+        ApplyViewSettings(settings); // aplica en vivo: onSaved dispara Refresh
         UpdateClockOnly();
         var displayOffset = TimeDisplayHelper.GetDisplayOffset(_timeDisplayMode, utcNow);
 
         // ── MarketState desde SessionEngine ───────────────────────────
         var state = _sessionEngine.GetMarketState(utcNow);
         IsWeekendClosed = state.IsWeekendClosed;
+        ShowWeekendBanner = state.IsWeekendClosed && CurrentViewMode == ViewMode.Bars;
         MarketPhase = state.PhaseDisplayName;
         InstitutionalActivity = state.InstitutionalActivity;
         LiquidityLevel = state.LiquidityLevel.ToString().ToUpperInvariant()

@@ -67,11 +67,16 @@
                 <TextBlock Text="Show session open/close times"/>
             </CheckBox>
 
-            <!-- Modo minimalista -->
+            <!-- Dos ejes independientes: compacidad (minimalista) y forma del timeline -->
             <CheckBox IsChecked="{Binding MinimalistMode}"
-                      Margin="0,0,0,12">
-                <TextBlock Text="Minimalist mode (bars only)"/>
+                      Margin="0,0,0,8">
+                <TextBlock Text="Minimalist mode (timeline only)"/>
             </CheckBox>
+
+            <TextBlock Text="Timeline style" Style="{DynamicResource LabelSecondary}" Margin="0,0,0,4"/>
+            <ComboBox ItemsSource="{Binding ViewModeOptions}"
+                      SelectedItem="{Binding SelectedViewMode}"
+                      Margin="0,0,0,12"/>
 
             <!-- Killzones (MMM + personalizadas mezcladas; solo las custom se pueden borrar) -->
             <TextBlock Text="Killzones" Style="{DynamicResource LabelSecondary}" Margin="0,0,0,4"/>

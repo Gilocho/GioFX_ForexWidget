@@ -220,4 +220,110 @@ public class ConfigurationLoaderTests
         Assert.Equal(new TimeOnly(6, 0), kzs[0].StartUtc);
         Directory.Delete(dir, true);
     }
+
+    // ── ViewMode + MinimalistMode: ejes independientes con dos migraciones ──
+    // (pre-Sprint 12: solo MinimalistMode bool; intermedio de Sprint 12:
+    //  ViewMode de 3 valores con "Minimalist")
+
+    [Fact]
+    public void Case13_PreSprint12File_KeepsMinimalistAndDefaultsToBars()
+    {
+        string dir = CreateTempConfigDir();
+        Directory.CreateDirectory(dir);
+        string path = ConfigurationPaths.Settings(dir);
+        File.WriteAllText(path, """
+            {
+              "Theme": "Dark",
+              "MinimalistMode": true
+            }
+            """);
+
+        var loader = new ConfigurationLoader(dir);
+        var settings = loader.LoadSettings();
+
+        Assert.Equal(ForexWidget.Domain.Enums.ViewMode.Bars, settings.ViewMode);
+        Assert.True(settings.MinimalistMode);
+        Directory.Delete(dir, true);
+    }
+
+    [Fact]
+    public void Case14_NeitherFieldPresent_DefaultsToBarsNonMinimalist()
+    {
+        string dir = CreateTempConfigDir();
+        Directory.CreateDirectory(dir);
+        string path = ConfigurationPaths.Settings(dir);
+        File.WriteAllText(path, """
+            {
+              "Theme": "Dark"
+            }
+            """);
+
+        var loader = new ConfigurationLoader(dir);
+        var settings = loader.LoadSettings();
+
+        Assert.Equal(ForexWidget.Domain.Enums.ViewMode.Bars, settings.ViewMode);
+        Assert.False(settings.MinimalistMode);
+        Directory.Delete(dir, true);
+    }
+
+    [Fact]
+    public void Case15_ClockAndMinimalist_AreIndependentAxes_BothPreserved()
+    {
+        string dir = CreateTempConfigDir();
+        Directory.CreateDirectory(dir);
+        string path = ConfigurationPaths.Settings(dir);
+        File.WriteAllText(path, """
+            {
+              "ViewMode": "Clock",
+              "MinimalistMode": true
+            }
+            """);
+
+        var loader = new ConfigurationLoader(dir);
+        var settings = loader.LoadSettings();
+
+        Assert.Equal(ForexWidget.Domain.Enums.ViewMode.Clock, settings.ViewMode);
+        Assert.True(settings.MinimalistMode);
+        Directory.Delete(dir, true);
+    }
+
+    [Fact]
+    public void Case16_ClockPlusMinimalist_RoundTripsThroughSaveAndLoad()
+    {
+        string dir = CreateTempConfigDir();
+        var loader = new ConfigurationLoader(dir);
+        var settings = ForexWidget.Domain.Models.AppSettings.Default with
+        {
+            ViewMode = ForexWidget.Domain.Enums.ViewMode.Clock,
+            MinimalistMode = true
+        };
+
+        loader.SaveSettings(settings);
+        var reloaded = loader.LoadSettings();
+
+        Assert.Equal(ForexWidget.Domain.Enums.ViewMode.Clock, reloaded.ViewMode);
+        Assert.True(reloaded.MinimalistMode);
+        Directory.Delete(dir, true);
+    }
+
+    [Fact]
+    public void Case17_IntermediateViewModeMinimalist_MigratesToBarsPlusMinimalist()
+    {
+        string dir = CreateTempConfigDir();
+        Directory.CreateDirectory(dir);
+        string path = ConfigurationPaths.Settings(dir);
+        File.WriteAllText(path, """
+            {
+              "ViewMode": "Minimalist",
+              "MinimalistMode": false
+            }
+            """);
+
+        var loader = new ConfigurationLoader(dir);
+        var settings = loader.LoadSettings();
+
+        Assert.Equal(ForexWidget.Domain.Enums.ViewMode.Bars, settings.ViewMode);
+        Assert.True(settings.MinimalistMode);
+        Directory.Delete(dir, true);
+    }
 }
